@@ -1,7 +1,11 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"
 
 
 function Dashboard() {
+
+    const token = localStorage.getItem("token")
+  const userId= localStorage.getItem("userId")
 
   const [userList , setUserList] =useState([])
   const[currentBalance , setCurrentBalance] = useState(0)
@@ -9,6 +13,7 @@ function Dashboard() {
   const prameter = {
     filter: searchUserName
   }
+
   const balanceParameter = {
     userId:userId
   }
@@ -17,10 +22,9 @@ function Dashboard() {
 
   const querySting = new URLSearchParams(prameter).toString()
 
-  
 
   
-  const token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4MjRkOTJiNmMyNjM0YWU4MzNkODJmNiIsImlhdCI6MTc0NzczNDE5N30.qwurAIn36btwFLDY3OaisJHrty0X-iI6uiFOUVj_kOY"
+  
   useEffect(()=>{
 
     const fetchUserList = async()=>{
@@ -49,7 +53,7 @@ function Dashboard() {
     const fetchCurrentBalance =async()=>{
 
       
-      const response = await fetch("http://localhost:3000/getMybalance?",{
+      const response = await fetch("http://localhost:3000/getMybalance?"+balanceQueryString,{
         method:"GET",
         headers:{
           "Content-Type":"application/json",
@@ -130,6 +134,8 @@ function UsersListComponent({userList})
 
 function SendComponent({sendUserDetails})
 {
+  const[money, setMoney] = useState(0)
+  const userId =localStorage.getItem("userId")
   return(
     <div className="flex flex-col mb-10 h-[700px] w-[700px] bg-white rounded-lg shadow-md p-5 justify-center items-center">
 
@@ -150,16 +156,75 @@ function SendComponent({sendUserDetails})
         Enter the amount you want to send
       </div>
       
-      <input type="text" placeholder= "Enter amount" className="rounded-lg border-3 border-gray-300 h-12 pl-5 w-full mb-4"></input>
+      <input type="number" value={money} onChange={(e)=>setMoney(e.target.value)} placeholder= "Enter amount" className="rounded-lg border-3 border-gray-300 h-12 pl-5 w-full mb-4"></input>
 
-     <button onClick={()=>{
+     <button onClick={async()=>{
 
+      // const response = await fetch("http://localhost:3000/sendMoney", {
+      //   method:"POST",
+      //   headers:{
+      //     "Content-Type":"application/json"
+      //   },
+      //   body:JSON.stringify({
+      //     senderId:userId,
+      //     money:money,
+      //     reciverId:sendUserDetails._userid 
+      //   })
+      // })
+
+      // if(!response.ok)
+      // {
+      //   console.log("Error in sending money")
+      // }
+
+      // const data = await response.json()
+      // console.log("Data - " + data)
+        const moneyAmount = parseFloat(money);
+  
+  if (isNaN(moneyAmount) || moneyAmount <= 0) {
+    alert("Please enter a valid amount");
+    return;
+  }
+
+  // Log the data being sent for debugging
+  console.log("Sending:", {
+    senderId: userId,
+    money: moneyAmount,
+    reciverId: sendUserDetails._userid
+  });
+
+  const response = await fetch("http://localhost:3000/sendMoney", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "authorization": `Bearer ${localStorage.getItem("token")}`  // Add auth token
+    },
+    body: JSON.stringify({
+      senderId: userId,
+      money: moneyAmount,
+      reciverId: sendUserDetails._userid
+    })
+  });
+
+  // Better error handling
+  if (!response.ok) {
+    const errorData = await response.json();
+    console.error("Error in sending money:", errorData);
+    alert(errorData.message || "Failed to send money");
+    return;
+  }
+
+  const data = await response.json();
+  console.log("Success:", data);
+  alert("Money sent successfully!");
+  
      }} className="w-full h-12 bg-green-500 text-white rounded-lg">Send Money</button>
     </div>
   )
 }
 function UserCardComponent({user})
 {
+  const navigate = useNavigate()
   console.log("users-" +user)
   return(
     <div className="flex flex-row justify-between items-center h-19 ">
@@ -177,7 +242,11 @@ function UserCardComponent({user})
     </div>
 
     <button onClick={()=>{
-
+      navigate("/sendmoney",{
+        state:{
+          sendUserDetails:user,
+        }
+      })
     }} className="bg-black text-white rounded-lg h-10 w-30  ">Send Money</button>
     </div>
   )

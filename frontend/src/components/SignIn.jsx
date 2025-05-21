@@ -1,4 +1,5 @@
 import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 
 
@@ -23,6 +24,7 @@ function SignIn()
 
 function SignInComponent({userNameVal, passwordVal, setUserNameVal, setPasswordVal})
 {
+    const navigate = useNavigate()
     return(
         <div>
 
@@ -62,6 +64,9 @@ function SignInComponent({userNameVal, passwordVal, setUserNameVal, setPasswordV
                      if(data.res=="success")
                      {
                         console.log("Login Success")
+                        localStorage.setItem("token", data.token)
+                        localStorage.setItem("userId", data._userId)
+                        navigate("/dashboard")
                      }
                 }
                    
@@ -69,7 +74,11 @@ function SignInComponent({userNameVal, passwordVal, setUserNameVal, setPasswordV
 
                 <div className="flex flex-row justify-center items-center gap-3">
                 <h1 className="text-xl font-medium text-center font-sans">Don't have an account?</h1>
-                <h1 className="underline underline-offset-1 font-medium cursor-pointer" >SignUp</h1>
+                <h1 onClick={
+                    ()=>{
+                        navigate("/signup")
+                    }
+                } className="underline underline-offset-1 font-medium cursor-pointer" >SignUp</h1>
                 </div>
                
 

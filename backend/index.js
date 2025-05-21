@@ -65,6 +65,7 @@ await newAccount.save()
      res.json({
         message :"User added !",
         token:JWT_token,
+        _userId:id
     })
 
  }
@@ -156,7 +157,8 @@ const id = currentUser._id
 
     res.json({
         res:"success",
-        token:token
+        token:token,
+        _userId:id
     })
 
  }
@@ -202,7 +204,7 @@ app.get("/getAllUsers", authMiddleware ,async (req,res)=>{
                 username: user.userName,
                 firstName: user.firstName,
                 lastName: user.lastName,
-                _id: user._id
+                _userid: user._id
             }))
         })
     }
@@ -256,7 +258,8 @@ app.post("/sendMoney", async(req,res)=>{
         if(!parseData.success)
         {
             return res.status(400).json({
-                message:"Wrong Input data"
+                message:"Wrong Input data",
+                details:parseData.error.errors
             })
         }
 

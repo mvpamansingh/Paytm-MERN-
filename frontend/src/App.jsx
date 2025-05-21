@@ -4,6 +4,7 @@ import { SignUp } from './components/SignUp'
 import { SignIn } from './components/SignIn'
 import { Dashboard, SendComponent } from './components/Dashboard'
 import { SendPage } from './components/SendPage'
+import { ProtectedRoute } from './components/Protected'
 function App() {
 
   return (
@@ -13,12 +14,21 @@ function App() {
         <BrowserRouter>
 
         <Routes>
-          
+          <Route path= "/" element = {<SignUp/>}/>
           <Route path ="/signup" element ={<SignUp/>}/>
-          <Route path = "signIn" element ={<SignIn/>} />
-          <Route path = "/dashboard" element ={<Dashboard/>}/>
+          <Route path = "signin" element ={<SignIn/>} />
+          <Route path = "/dashboard" element ={
+            <ProtectedRoute>
+              <Dashboard/>
+            </ProtectedRoute>
+            }/>
 
-          <Route path="/sendMonney" element = {<SendPage/>}/>
+          <Route path="/sendmoney" element = {
+            <ProtectedRoute>
+              <SendPage/>
+            </ProtectedRoute>
+            
+            }/>
 
         </Routes>
         </BrowserRouter>

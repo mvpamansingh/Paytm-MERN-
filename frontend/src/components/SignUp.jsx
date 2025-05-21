@@ -1,5 +1,6 @@
 import { use } from "react"
 import { useEffect, useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 function SignUp()
 {
@@ -41,6 +42,8 @@ function SignUp()
 
 function SignupComponent({firstNameVal,lastNameVal,userNameVal,passwordVal, setFirstNameVal,setLastNameVal,setUserNameVal,setPasswordVal})
 {
+    const navigate = useNavigate()
+
     return(
         <div>
 
@@ -79,13 +82,21 @@ function SignupComponent({firstNameVal,lastNameVal,userNameVal,passwordVal, setF
                                 lastName: lastNameVal,
                                 password: passwordVal
                             })
+
                         })
+                        const data = await response.json()
+                        if(response.ok)
+                        {
+                                localStorage.setItem("token",data.token)
+                                localStorage.setItem("userId",data._userId)
+                                navigate("/dashboard")
+                        }
                 }} className="bg-black text-white p-2 w-full cursor-pointer">Sign Up</button>
 
                 <div className="flex flex-row justify-center items-center gap-3">
                 <h1 className="text-xl font-medium text-center font-sans">Already have an account?</h1>
                 <h1 onClick={()=>{
-
+                    navigate("/signin")
                 }} className="underline underline-offset-1 font-medium cursor-pointer" >Login</h1>
                 </div>
                
